@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NZ Mathematics Assessment Engine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nzm: {
+              teal: '#0d9488',
+              tealDark: '#0f766e',
+              navy: '#0f172a',
+              amber: '#f59e0b',
+              emerald: '#10b981',
+              sky: '#0284c7'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .grid-cell { transition: all 0.2s ease-in-out; }
+    .grid-cell:hover { opacity: 0.85; cursor: pointer; }
+    .option-btn { transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1); }
+    .option-btn:hover:not(:disabled) { transform: translateY(-1px); }
+    .choc-draggable { cursor: grab; touch-action: none; user-select: none; }
+    .choc-draggable:active { cursor: grabbing; }
+    @keyframes popIn {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-popIn { animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-teal-200">
+
+  <!-- NAVIGATION HEADER -->
+  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-teal-500 text-slate-950 font-black px-3 py-1 rounded-lg text-xs tracking-wider uppercase">
+          NZ Math Diagnostic
+        </div>
+        <div>
+          <h1 class="font-bold text-base sm:text-lg leading-tight">Mathematics Assessment Engine</h1>
+          <p class="text-xs text-slate-400 hidden sm:block">NZ Curriculum Phases 2, 3 & 4 (Years 4–10)</p>
+        </div>
+      </div>
+      <div id="header-user-info" class="hidden flex items-center space-x-4 text-xs sm:text-sm text-slate-300">
+        <span class="bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
+          <i class="fa-solid fa-user-graduate text-teal-400 mr-1.5"></i><span id="nav-student-name">Student</span> (Year <span id="nav-year-level">6</span>)
+        </span>
+        <span class="bg-slate-800 px-3 py-1 rounded-full border border-slate-700 hidden md:inline">
+          <i class="fa-solid fa-key text-amber-400 mr-1.5"></i>ID: <span id="nav-test-id">NZ-MATH-30Q</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <main class="flex-grow max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
+
+    <!-- 1. REGISTRATION SCREEN -->
+    <section id="screen-registration" class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden max-w-3xl mx-auto w-full">
+      <div class="bg-gradient-to-r from-slate-900 via-teal-900 to-slate-900 p-8 sm:p-10 text-white text-center relative">
+        <div class="w-16 h-16 bg-teal-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-teal-400/30">
+          <i class="fa-solid fa-shapes text-3xl text-teal-400"></i>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black tracking-tight">NZ Mathematics Diagnostic Evaluation</h2>
+        <p class="text-teal-200 text-sm mt-1">Interactive Assessment Across Curriculum Phases 2, 3 & 4 (Years 4–10)</p>
+      </div>
+
+      <form id="form-registration" class="p-6 sm:p-10 space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-semibold text-slate-700 mb-2" for="reg-name">
+              <i class="fa-solid fa-user text-teal-600 mr-2"></i>Student Full Name
+            </label>
+            <input type="text" id="reg-name" required placeholder="e.g. Aroha Tīmene"
+              class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none text-slate-800 font-medium">
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2" for="reg-year">
+              <i class="fa-solid fa-graduation-cap text-teal-600 mr-2"></i>Year Level
+            </label>
+            <select id="reg-year" required
+              class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none text-slate-800 font-medium bg-white">
+              <option value="4">Year 4 (Phase 2)</option>
+              <option value="5">Year 5 (Phase 2)</option>
+              <option value="6" selected>Year 6 (Phase 2)</option>
+              <option value="7">Year 7 (Phase 3)</option>
+              <option value="8">Year 8 (Phase 3)</option>
+              <option value="9">Year 9 (Phase 4)</option>
+              <option value="10">Year 10 (Phase 4)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2" for="reg-session">
+            <i class="fa-solid fa-barcode text-teal-600 mr-2"></i>Assessment Session ID
+          </label>
+          <input type="text" id="reg-session" required value="NZ-MATH-30Q"
+            class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none text-slate-800 font-medium">
+        </div>
+
+        <!-- Curriculum Structure Badges -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+          <div class="bg-teal-50 border border-teal-200 rounded-xl p-3 text-xs">
+            <div class="font-bold text-teal-900 flex items-center mb-1">
+              <span class="w-5 h-5 bg-teal-600 text-white rounded-full inline-flex items-center justify-center text-[10px] mr-1.5">2</span>
+              Phase 2 (Q1–Q10)
+            </div>
+            <p class="text-teal-700">Grid area selection, decimal number lines, chocolate sharing box, floor tiling, climate graphs, mere pounamu offset ruler.</p>
+          </div>
+          <div class="bg-sky-50 border border-sky-200 rounded-xl p-3 text-xs">
+            <div class="font-bold text-sky-900 flex items-center mb-1">
+              <span class="w-5 h-5 bg-sky-600 text-white rounded-full inline-flex items-center justify-center text-[10px] mr-1.5">3</span>
+              Phase 3 (Q11–Q20)
+            </div>
+            <p class="text-sky-700">Percentage grid fractions, ratio shell sharing, supplementary angles, coordinate reflection, journey graphs, map scales.</p>
+          </div>
+          <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3 text-xs">
+            <div class="font-bold text-indigo-900 flex items-center mb-1">
+              <span class="w-5 h-5 bg-indigo-600 text-white rounded-full inline-flex items-center justify-center text-[10px] mr-1.5">4</span>
+              Phase 4 (Q21–Q30)
+            </div>
+            <p class="text-indigo-700">Linear expansion, guy wire Pythagoras, cylinder rainwater tanks, quadratics, box plot IQR, trigonometry, dependent probability.</p>
+          </div>
+        </div>
+
+        <button type="submit"
+          class="w-full py-4 bg-teal-600 hover:bg-teal-700 text-white font-black rounded-xl shadow-lg shadow-teal-600/30 transition duration-200 text-base flex items-center justify-center space-x-2">
+          <span>Start 30-Question Assessment</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+    </section>
+
+    <!-- 2. ASSESSMENT TEST INTERFACE -->
+    <section id="screen-test" class="hidden flex-col space-y-6">
+      
+      <!-- Top Status Header & Navigation Grid -->
+      <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+          <div class="flex items-center space-x-3">
+            <span id="question-badge" class="px-3 py-1 bg-teal-100 text-teal-800 text-xs font-bold rounded-full uppercase tracking-wider">
+              Strand
+            </span>
+            <span id="phase-badge" class="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">
+              Phase 2
+            </span>
+            <span id="question-counter-text" class="text-sm font-semibold text-slate-500">
+              Question 1 of 30
+            </span>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <button id="btn-audio-read" onclick="playQuestionAudio()" 
+              class="flex items-center space-x-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-lg border border-slate-300 transition">
+              <i class="fa-solid fa-volume-high text-teal-600"></i>
+              <span>Read Aloud</span>
+            </button>
+            <button id="btn-flag-q" onclick="toggleFlag()" 
+              class="flex items-center space-x-1 text-xs bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-700 font-semibold px-3 py-1.5 rounded-lg border border-slate-300 transition">
+              <i class="fa-regular fa-flag text-amber-500" id="flag-icon"></i>
+              <span id="flag-text">Flag</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+          <div id="test-progress-bar" class="bg-teal-600 h-full w-0 transition-all duration-300"></div>
+        </div>
+
+        <!-- 30-Question Grid Quick Jump Toolbar -->
+        <div class="pt-2 border-t border-slate-100">
+          <div class="flex justify-between items-center mb-1.5">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Question Navigator (1–30)</span>
+            <span class="text-[11px] text-slate-500">Dark = Answered | Yellow = Flagged</span>
+          </div>
+          <div id="quick-jump-grid" class="flex flex-wrap gap-1.5">
+            <!-- 30 dynamic buttons -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Question Card Container -->
+      <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 sm:p-8 flex flex-col space-y-6">
+        
+        <!-- Prompt -->
+        <div class="flex items-start space-x-3">
+          <span class="text-teal-600 font-black text-xl sm:text-2xl" id="q-number-label">Q1.</span>
+          <div class="flex-grow">
+            <p id="q-prompt" class="text-base sm:text-lg font-semibold text-slate-800 leading-relaxed">
+              Loading Question Prompt...
+            </p>
+          </div>
+        </div>
+
+        <!-- Interactive Visual Canvas Container -->
+        <div id="manipulative-container" class="w-full flex justify-center items-center p-4 bg-slate-50 rounded-2xl border border-slate-200 min-h-[220px]">
+          <!-- Dynamic Visuals -->
+        </div>
+
+        <!-- Answers Controls Container -->
+        <div id="answers-container" class="w-full pt-2">
+          <!-- Dynamic Answer Options -->
+        </div>
+
+      </div>
+
+      <!-- Bottom Controls -->
+      <div class="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+        <button id="btn-prev" onclick="navigateQuestion(-1)"
+          class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition flex items-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed">
+          <i class="fa-solid fa-chevron-left text-xs"></i>
+          <span>Previous</span>
+        </button>
+
+        <button id="btn-next" onclick="navigateQuestion(1)"
+          class="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-md shadow-teal-600/20 transition flex items-center space-x-2">
+          <span id="btn-next-label">Next</span>
+          <i class="fa-solid fa-chevron-right text-xs" id="btn-next-icon"></i>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- 3. END-OF-TEST DIAGNOSTIC REPORT SCREEN -->
+    <section id="screen-results" class="hidden flex-col space-y-8 my-4">
+      
+      <!-- Top Diagnostic Summary Banner -->
+      <div class="bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+        <div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+          
+          <div class="md:col-span-2 space-y-2">
+            <div class="inline-flex items-center space-x-2 bg-teal-500/30 border border-teal-400/30 px-3 py-1 rounded-full text-xs font-semibold text-teal-300">
+              <i class="fa-solid fa-award"></i> Diagnostic Evaluation Complete
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-black" id="report-student-heading">Student Diagnostic Report</h2>
+            <p class="text-slate-300 text-xs sm:text-sm" id="report-meta-info">
+              Year 6 | Session: NZ-MATH-30Q
+            </p>
+            <div id="sheet-sync-status" class="pt-2 text-xs font-medium">
+              <!-- Sync status badge -->
+            </div>
+          </div>
+
+          <!-- Score & Stanine Badge -->
+          <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 text-center flex flex-col justify-center items-center">
+            <div class="text-xs uppercase tracking-wider font-bold text-teal-200">Overall Assessment Standard</div>
+            <div class="text-4xl sm:text-5xl font-black text-white my-1" id="report-score-pct">0%</div>
+            <div class="inline-block bg-amber-400 text-slate-950 px-3.5 py-1 rounded-full text-xs font-extrabold" id="report-stanine-badge">
+              Stanine 5 (Average)
+            </div>
+            <p class="text-[11px] text-slate-300 mt-2" id="report-scale-score">Phase 2-4 Curriculum Band Achieved</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Strand Performance Breakdown Cards -->
+      <div>
+        <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center">
+          <i class="fa-solid fa-chart-pie text-teal-600 mr-2"></i>Strand Performance Breakdown
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="strand-cards-container">
+          <!-- Strand cards -->
+        </div>
+      </div>
+
+      <!-- Item-by-Item Review Table -->
+      <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+        <div class="p-5 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 flex items-center">
+              <i class="fa-solid fa-list-check text-teal-600 mr-2"></i>Item-by-Item Worked Diagnostic Review
+            </h3>
+            <p class="text-xs text-slate-500">Step-by-step worked solutions and key mathematical insights for all 30 questions</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="downloadCSVExport()" class="text-xs bg-slate-800 hover:bg-slate-900 text-white font-semibold px-3.5 py-2 rounded-lg transition shadow-sm flex items-center space-x-1.5">
+              <i class="fa-solid fa-file-csv text-emerald-400"></i>
+              <span>Download CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 text-xs uppercase font-bold tracking-wider border-b border-slate-200">
+                <th class="p-3.5 w-12 text-center">#</th>
+                <th class="p-3.5">Phase & Strand</th>
+                <th class="p-3.5">Student Answer</th>
+                <th class="p-3.5">Correct Answer</th>
+                <th class="p-3.5 text-center">Result</th>
+                <th class="p-3.5">Worked Solution & Mathematical Insight</th>
+              </tr>
+            </thead>
+            <tbody id="review-table-body" class="divide-y divide-slate-200 text-sm">
+              <!-- Dynamic rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- GOOGLE BACKEND INTEGRATION PAYLOAD SUMMARY -->
+      <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 sm:p-8 space-y-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 bg-teal-100 text-teal-700 rounded-xl flex items-center justify-center font-bold text-xl">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-slate-900">Google Sheets Automated Backend</h3>
+            <p class="text-xs text-slate-500">Live Web App Endpoint Connected</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 text-emerald-400 p-4 rounded-xl font-mono text-xs overflow-x-auto border border-slate-800">
+          <span class="text-slate-400">// Target Web App Endpoint URL:</span><br>
+          <span class="text-amber-300">https://script.google.com/macros/s/AKfycbx-upDbrHambxm3Ex1HcmKPdQ-Xs_9qzi_Ehe4jw3pKdE4_pGM5qG0L07NdaPEr4T89/exec</span>
+        </div>
+
+        <div class="flex justify-between items-center pt-2">
+          <button onclick="resendGoogleSheetData()" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl transition text-xs flex items-center space-x-2">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Resend Data to Google Sheet</span>
+          </button>
+
+          <button onclick="resetAssessment()" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl transition text-sm flex items-center space-x-2">
+            <i class="fa-solid fa-rotate-right"></i>
+            <span>Start New Session</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="bg-slate-900 text-slate-400 text-xs py-4 border-t border-slate-800 text-center mt-auto">
+    <div class="max-w-7xl mx-auto px-4">
+      NZ Mathematics Assessment Engine &bull; Curriculum Phases 2, 3 & 4 (Years 4–10)
+    </div>
+  </footer>
+
+  <!-- COMPLETE APPLICATION JAVASCRIPT & 30-QUESTION BANK -->
+  <script>
+    // Embedded Google Apps Script Deployment URL
+    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-upDbrHambxm3Ex1HcmKPdQ-Xs_9qzi_Ehe4jw3pKdE4_pGM5qG0L07NdaPEr4T89/exec";
+
+    // Application state
+    let studentData = { name: '', yearLevel: 6, sessionId: 'NZ-MATH-30Q' };
+    let currentQuestionIndex = 0;
+    let studentAnswers = {};
+    let flaggedQuestions = new Set();
+    let q1SelectedShapes = new Set();
+    let q3ChocolatesInBox = 0;
+    let lastEvaluatedResults = null;
+
+    /* ==========================================================================
+       COMPLETE 30 CURRICULUM-ALIGNED QUESTION BANK (PHASES 2, 3 & 4)
+       ========================================================================== */
+    const questionBank = [
+      // ------------------------------------------------------------------------
+      // PHASE 2 (Years 4–6, Questions 1–10)
+      // ------------------------------------------------------------------------
+      {
+        id: 'Q1',
+        phase: 'Phase 2',
+        strand: 'Measurement & Geometry',
+        prompt: 'Click on all of the shapes that have an area of 12 squares.',
+        type: 'grid_select_12',
+        audioText: 'Click on all of the shapes that have an area of 12 squares.',
+        correctVal: ['Shape A', 'Shape B', 'Shape C'],
+        solution: 'Shape A = 3×4 = 12 squares; Shape B = L-shape compound area (4 + 8) = 12 squares; Shape C = 2×6 vertical rectangle = 12 squares; Shape D = 10 squares. Shapes A, B, and C all have an area of 12 squares.',
+        insight: 'Tests rectangular and compound grid area calculation by counting or multiplying unit squares.'
+      },
+      {
+        id: 'Q2',
+        phase: 'Phase 2',
+        strand: 'Number & Algebra',
+        prompt: 'What number is the arrow pointing to on this number line?',
+        type: 'mcq',
+        options: ['4.01', '4.05', '4.1', '4.15', '4.5'],
+        audioText: 'What number is the arrow pointing to on this number line?',
+        correctAnswer: '4.1',
+        solution: 'The endpoints marked on the number line are 4.0 and 4.2. The arrow points exactly halfway between 4.0 and 4.2, which is 4.1.',
+        insight: 'Interpolating decimal numbers between tenths.'
+      },
+      {
+        id: 'Q3',
+        phase: 'Phase 2',
+        strand: 'Number & Algebra',
+        prompt: 'A group of 4 friends shared these chocolates equally. Drag (or click) the number of pieces of chocolate that 1 friend got into the box.',
+        type: 'choc_sharing',
+        audioText: 'A group of 4 friends shared these chocolates equally. Drag or click the number of pieces of chocolate that 1 friend got into the box.',
+        correctVal: 2,
+        solution: 'There are 8 pieces of chocolate in total. Sharing 8 chocolates equally among 4 friends = 8 ÷ 4 = 2 pieces per friend.',
+        insight: 'Multiplicative equal sharing / division concept (8 ÷ 4 = 2).'
+      },
+      {
+        id: 'Q4',
+        phase: 'Phase 2',
+        strand: 'Measurement & Geometry',
+        prompt: 'Kara helped her father put tiles around the edge of the floor like this. How many more of these tiles would it take to cover the whole floor?',
+        type: 'mcq',
+        options: ['7', '12', '16', '18', 'None of these'],
+        audioText: 'How many more of these tiles would it take to cover the whole floor?',
+        correctAnswer: '12',
+        solution: 'The outer border dimensions are 6 tiles wide by 5 tiles high. Leaving the outer 1-tile border means the empty inner floor is 4 tiles wide by 3 tiles high = 4 × 3 = 12 tiles.',
+        insight: 'Distinguishes inner floor rectangular area from perimeter border tiles.'
+      },
+      {
+        id: 'Q5',
+        phase: 'Phase 2',
+        strand: 'Statistics & Probability',
+        prompt: 'This graph shows people’s ideas of what they could do about climate change at school. How many more people want to Plant trees than Start a compost?',
+        type: 'mcq',
+        options: ['9', '10', '12', '13', '14'],
+        audioText: 'How many more people want to Plant trees than Start a compost?',
+        correctAnswer: '12',
+        solution: 'Plant trees = 19 votes. Start a compost = 7 votes. Difference = 19 - 7 = 12.',
+        insight: 'Comparative frequency analysis from bar charts.'
+      },
+      {
+        id: 'Q6',
+        phase: 'Phase 2',
+        strand: 'Number & Algebra',
+        prompt: 'Solomon earned $90.00 for 3 hours work. At this rate, how much would Solomon earn in 7 1/2 hours?',
+        type: 'fill_blank',
+        audioText: 'Solomon earned 90 dollars for 3 hours work. At this rate, how much would Solomon earn in 7 and a half hours?',
+        correctAnswer: '225.00',
+        solution: 'Hourly rate = $90 ÷ 3 = $30 per hour. For 7.5 hours = 7.5 × $30 = $225.00.',
+        insight: 'Determining unit hourly rate and proportional scaling.'
+      },
+      {
+        id: 'Q7',
+        phase: 'Phase 2',
+        strand: 'Number & Algebra',
+        prompt: 'Jen has $5.50 and Tyler has $3.30. How much money does Jen give to Tyler, so that they both have the same amount of money?',
+        type: 'mcq',
+        options: ['90¢', '$1.10', '$1.20', '$2.20', '$4.40'],
+        audioText: 'How much money does Jen give to Tyler so that they both have the same amount of money?',
+        correctAnswer: '$1.10',
+        solution: 'Total money = $5.50 + $3.30 = $8.80. Equal amount each = $8.80 ÷ 2 = $4.40. Jen gives $5.50 - $4.40 = $1.10.',
+        insight: 'Equalizing values. Avoids giving the raw total difference ($2.20).'
+      },
+      {
+        id: 'Q8',
+        phase: 'Phase 2',
+        strand: 'Measurement & Geometry',
+        prompt: 'How long is this mere pounamu?',
+        type: 'mcq',
+        options: ['2 centimetres', '6 centimetres', '6.5 centimetres', '8.5 centimetres', '9 centimetres'],
+        audioText: 'How long is this mere pounamu?',
+        correctAnswer: '6.5 centimetres',
+        solution: 'Start position = 2.0 cm, End position = 8.5 cm. Actual length = 8.5 - 2.0 = 6.5 centimetres.',
+        insight: 'Offset ruler measurement calculation.'
+      },
+      {
+        id: 'Q9',
+        phase: 'Phase 2',
+        strand: 'Number & Algebra',
+        prompt: 'What is 0.6 + 0.4?',
+        type: 'mcq',
+        options: ['0.01', '0.10', '1', '10', 'None of these'],
+        audioText: 'What is 0.6 plus 0.4?',
+        correctAnswer: '1',
+        solution: '6 tenths + 4 tenths = 10 tenths = 1 whole (1.0 or 1).',
+        insight: 'Decimal place value addition overcoming misconception of 0.10.'
+      },
+      {
+        id: 'Q10',
+        phase: 'Phase 2',
+        strand: 'Number & Algebra',
+        prompt: 'Harley knows that 8 × 8 = 64. How could he use this to work out 8 × 16?',
+        type: 'mcq',
+        options: ['64 × 2', '64 × 8', '64 × 16', '64 + 8', '64 + 16'],
+        audioText: 'Harley knows that 8 times 8 equals 64. How could he use this to work out 8 times 16?',
+        correctAnswer: '64 × 2',
+        solution: '16 is double 8 (8 × 2). So 8 × 16 = 8 × (8 × 2) = (8 × 8) × 2 = 64 × 2.',
+        insight: 'Multiplicative doubling mental strategy.'
+      },
+
+      // ------------------------------------------------------------------------
+      // PHASE 3 (Years 7–8, Questions 11–20)
+      // ------------------------------------------------------------------------
+      {
+        id: 'Q11',
+        phase: 'Phase 3',
+        strand: 'Number & Algebra',
+        prompt: 'A grid of 100 squares has 45 shaded tiles. What fraction of the grid is shaded, written in simplest form?',
+        type: 'mcq',
+        options: ['9/20', '45/100', '4/9', '9/10', '1/2'],
+        audioText: 'What fraction of the grid is shaded, written in simplest form?',
+        correctAnswer: '9/20',
+        solution: '45/100 simplified by dividing numerator and denominator by 5 gives 9/20.',
+        insight: 'Fraction simplification from percentage grids.'
+      },
+      {
+        id: 'Q12',
+        phase: 'Phase 3',
+        strand: 'Number & Algebra',
+        prompt: 'Sione shares 25 kaio shell beads between Nikau and Kahu in the ratio 3 : 2. How many shells does Nikau receive?',
+        type: 'fill_blank',
+        audioText: 'Sione shares 25 kaio shell beads between Nikau and Kahu in the ratio 3 to 2. How many shells does Nikau receive?',
+        correctAnswer: '15',
+        solution: 'Total parts = 3 + 2 = 5. Value of 1 part = 25 ÷ 5 = 5 shells. Nikau receives 3 parts = 3 × 5 = 15 shells.',
+        insight: 'Proportional ratio partitioning.'
+      },
+      {
+        id: 'Q13',
+        phase: 'Phase 3',
+        strand: 'Measurement & Geometry',
+        prompt: 'Two angles lie on a straight line. One angle measures 125°. The other is angle x. What is the value of x + 15°?',
+        type: 'mcq',
+        options: ['70°', '55°', '40°', '65°', '180°'],
+        audioText: 'What is the value of x plus 15 degrees?',
+        correctAnswer: '70°',
+        solution: 'Straight line angles sum to 180°: x = 180° - 125° = 55°. Therefore x + 15° = 55° + 15° = 70°.',
+        insight: 'Supplementary angle theorems and expression evaluation.'
+      },
+      {
+        id: 'Q14',
+        phase: 'Phase 3',
+        strand: 'Measurement & Geometry',
+        prompt: 'A point at coordinates (3, 4) is reflected across the x-axis. What are the coordinates of the reflected point?',
+        type: 'mcq',
+        options: ['(3, -4)', '(-3, 4)', '(-3, -4)', '(4, 3)', '(4, -3)'],
+        audioText: 'What are the coordinates of the reflected point across the x-axis?',
+        correctAnswer: '(3, -4)',
+        solution: 'Reflection across the x-axis keeps the x-coordinate identical and negates the y-coordinate: (x, y) -> (x, -y). Thus (3, 4) -> (3, -4).',
+        insight: 'Cartesian coordinate axis reflections.'
+      },
+      {
+        id: 'Q15',
+        phase: 'Phase 3',
+        strand: 'Number & Algebra',
+        prompt: 'Evaluate the algebraic expression: 4x² - 3y, when x = -2 and y = 5.',
+        type: 'fill_blank',
+        audioText: 'Evaluate the algebraic expression 4 x squared minus 3 y when x equals -2 and y equals 5.',
+        correctAnswer: '1',
+        solution: 'x² = (-2)² = 4. 4x² = 4 × 4 = 16. 3y = 3 × 5 = 15. 16 - 15 = 1.',
+        insight: 'Order of operations and squaring negative numbers.'
+      },
+      {
+        id: 'Q16',
+        phase: 'Phase 3',
+        strand: 'Statistics & Probability',
+        prompt: 'Hemi rode his bicycle for a total of 90 minutes (1.5 hours). He covered 15 km in the first 30 mins, rested for 15 mins, and covered another 15 km in the final 45 mins. What was his average speed for the full trip in km/h?',
+        type: 'mcq',
+        options: ['20 km/h', '30 km/h', '22.5 km/h', '15 km/h', '25 km/h'],
+        audioText: 'What was his average speed for the full trip in kilometres per hour?',
+        correctAnswer: '20 km/h',
+        solution: 'Total distance = 15 + 15 = 30 km. Total elapsed time = 1.5 hours. Average speed = 30 ÷ 1.5 = 20 km/h.',
+        insight: 'Distance-time graph average speed computation incorporating rest time.'
+      },
+      {
+        id: 'Q17',
+        phase: 'Phase 3',
+        strand: 'Number & Algebra',
+        prompt: 'The overnight temperature in Otago was -6°C. By midday, it reached 15°C. What was the total rise in temperature?',
+        type: 'mcq',
+        options: ['21°C', '9°C', '15°C', '-21°C', '11°C'],
+        audioText: 'What was the total rise in temperature?',
+        correctAnswer: '21°C',
+        solution: 'Temperature difference = 15 - (-6) = 15 + 6 = 21°C.',
+        insight: 'Calculating distance across integer zero.'
+      },
+      {
+        id: 'Q18',
+        phase: 'Phase 3',
+        strand: 'Statistics & Probability',
+        prompt: 'A kete contains 6 red, 9 green, and 5 blue marbles. If one marble is drawn at random, what is the probability that it is NOT green?',
+        type: 'mcq',
+        options: ['11/20', '9/20', '1/2', '3/5', '7/20'],
+        audioText: 'What is the probability that the drawn marble is NOT green?',
+        correctAnswer: '11/20',
+        solution: 'Total marbles = 6 + 9 + 5 = 20. Non-green marbles = 6 + 5 = 11. P(not green) = 11/20.',
+        insight: 'Complementary event probability.'
+      },
+      {
+        id: 'Q19',
+        phase: 'Phase 3',
+        strand: 'Measurement & Geometry',
+        prompt: 'A map scale is 1 cm : 3.5 km. The distance between two kiwifruit orchards on the map is 8.2 cm. What is the actual distance in km?',
+        type: 'fill_blank',
+        audioText: 'What is the actual distance in kilometres for a map measurement of 8.2 centimetres?',
+        correctAnswer: '28.7',
+        solution: 'Actual distance = 8.2 cm × 3.5 km/cm = 28.7 km.',
+        insight: 'Scale model distance conversion.'
+      },
+      {
+        id: 'Q20',
+        phase: 'Phase 3',
+        strand: 'Number & Algebra',
+        prompt: 'Store A sells a 2 kg bag of kūmara for $6.40. Store B sells a 3.5 kg bag of kūmara for $10.50. Which store is cheaper per kilogram, and by how much?',
+        type: 'mcq',
+        options: [
+          'Store B by $0.20/kg',
+          'Store A by $0.20/kg',
+          'Both are equal value',
+          'Store B by $0.50/kg',
+          'Store A by $0.30/kg'
+        ],
+        audioText: 'Which store is cheaper per kilogram and by how much?',
+        correctAnswer: 'Store B by $0.20/kg',
+        solution: 'Store A unit price = $6.40 ÷ 2 = $3.20/kg. Store B unit price = $10.50 ÷ 3.5 = $3.00/kg. Store B is cheaper by $3.20 - $3.00 = $0.20/kg.',
+        insight: 'Unit rate financial comparison.'
+      },
+
+      // ------------------------------------------------------------------------
+      // PHASE 4 (Years 9–10, Questions 21–30)
+      // ------------------------------------------------------------------------
+      {
+        id: 'Q21',
+        phase: 'Phase 4',
+        strand: 'Number & Algebra',
+        prompt: 'Solve the linear equation for x: 5(2x - 1) = 3(x + 10)',
+        type: 'fill_blank',
+        audioText: 'Solve the linear equation 5 times 2 x minus 1 equals 3 times x plus 10.',
+        correctAnswer: '5',
+        solution: 'Expand brackets: 10x - 5 = 3x + 30 => 10x - 3x = 30 + 5 => 7x = 35 => x = 5.',
+        insight: 'Linear algebraic expansion and solution.'
+      },
+      {
+        id: 'Q22',
+        phase: 'Phase 4',
+        strand: 'Measurement & Geometry',
+        prompt: 'A guy wire is attached to a vertical 16 m flagpole from a point on the ground 12 m from the base. How long is the guy wire?',
+        type: 'mcq',
+        options: ['20 m', '18 m', '28 m', '24 m', '14 m'],
+        audioText: 'How long is the guy wire?',
+        correctAnswer: '20 m',
+        solution: 'Pythagoras theorem: c² = 12² + 16² = 144 + 256 = 400. c = √400 = 20 m.',
+        insight: 'Application of Pythagorean theorem.'
+      },
+      {
+        id: 'Q23',
+        phase: 'Phase 4',
+        strand: 'Measurement & Geometry',
+        prompt: 'A cylindrical rainwater tank at a marae has radius r = 2 m and height h = 5 m. Calculate its volume in cubic metres (m³). (Use π ≈ 3.142)',
+        type: 'fill_blank',
+        audioText: 'Calculate the volume of the cylindrical rainwater tank in cubic metres.',
+        correctAnswer: '62.84',
+        solution: 'V = π r² h = 3.142 × (2)² × 5 = 3.142 × 4 × 5 = 62.84 m³.',
+        insight: 'Cylinder volume calculation.'
+      },
+      {
+        id: 'Q24',
+        phase: 'Phase 4',
+        strand: 'Number & Algebra',
+        prompt: 'Factorise the quadratic expression completely: x² - 9x + 20',
+        type: 'mcq',
+        options: ['(x - 4)(x - 5)', '(x + 4)(x + 5)', '(x - 2)(x - 10)', '(x - 1)(x - 20)', '(x + 2)(x - 10)'],
+        audioText: 'Factorise the quadratic expression x squared minus 9 x plus 20 completely.',
+        correctAnswer: '(x - 4)(x - 5)',
+        solution: 'Numbers multiplying to +20 and adding to -9 are -4 and -5. Thus (x - 4)(x - 5).',
+        insight: 'Quadratic trinomial factorisation.'
+      },
+      {
+        id: 'Q25',
+        phase: 'Phase 4',
+        strand: 'Number & Algebra',
+        prompt: 'Solve the simultaneous equations for x and y: 3x + 2y = 19 and x - y = 3.',
+        type: 'mcq',
+        options: ['x = 5, y = 2', 'x = 6, y = 1', 'x = 4, y = 3', 'x = 7, y = -1', 'x = 3, y = 5'],
+        audioText: 'Solve the simultaneous equations for x and y.',
+        correctAnswer: 'x = 5, y = 2',
+        solution: 'From x - y = 3 => x = y + 3. Substitute into first: 3(y + 3) + 2y = 19 => 3y + 9 + 2y = 19 => 5y = 10 => y = 2. Then x = 2 + 3 = 5.',
+        insight: 'Simultaneous linear system resolution.'
+      },
+      {
+        id: 'Q26',
+        phase: 'Phase 4',
+        strand: 'Statistics & Probability',
+        prompt: 'From the Box Plot below, calculate the Interquartile Range (IQR) of test scores.',
+        type: 'mcq',
+        options: ['23', '67', '33.5', '45', '22'],
+        audioText: 'Calculate the Interquartile Range from the Box Plot.',
+        correctAnswer: '23',
+        solution: 'Lower Quartile Q1 = 22, Upper Quartile Q3 = 45. IQR = Q3 - Q1 = 45 - 22 = 23.',
+        insight: 'Interquartile range calculation from five-number summary.'
+      },
+      {
+        id: 'Q27',
+        phase: 'Phase 4',
+        strand: 'Measurement & Geometry',
+        prompt: 'Two similar shapes have a linear scale factor of 1 : 4. If the smaller shape has an area of 5 m², what is the area of the larger shape?',
+        type: 'fill_blank',
+        audioText: 'What is the area of the larger shape in square metres?',
+        correctAnswer: '80',
+        solution: 'Area scale factor = (linear scale factor)² = 4² = 16. Larger area = 5 m² × 16 = 80 m².',
+        insight: 'Area scale factor relationship k².'
+      },
+      {
+        id: 'Q28',
+        phase: 'Phase 4',
+        strand: 'Number & Algebra',
+        prompt: 'Hemi invests $3,000 in a savings account earning 6% per annum compound interest. What will be the total value of his investment after 2 years?',
+        type: 'mcq',
+        options: ['$3,370.80', '$3,360.00', '$3,180.00', '$3,450.00', '$3,200.00'],
+        audioText: 'What will be the total value of his investment after 2 years?',
+        correctAnswer: '$3,370.80',
+        solution: 'A = 3000 × (1.06)² = 3000 × 1.1236 = $3,370.80.',
+        insight: 'Compound interest formula calculation.'
+      },
+      {
+        id: 'Q29',
+        phase: 'Phase 4',
+        strand: 'Measurement & Geometry',
+        prompt: 'In a right-angled triangle, the hypotenuse is 20 cm long and an acute angle is 30°. What is the length of the side opposite to this 30° angle?',
+        type: 'mcq',
+        options: ['10 cm', '17.32 cm', '11.55 cm', '12 cm', '5 cm'],
+        audioText: 'What is the length of the side opposite to this 30 degree angle?',
+        correctAnswer: '10 cm',
+        solution: 'sin(30°) = opposite / hypotenuse => 0.5 = opposite / 20 => opposite = 20 × 0.5 = 10 cm.',
+        insight: 'Right triangle sine trigonometry.'
+      },
+      {
+        id: 'Q30',
+        phase: 'Phase 4',
+        strand: 'Statistics & Probability',
+        prompt: 'A kete contains 5 green apples and 7 red apples. Two apples are picked at random without replacement. What is the probability that BOTH apples picked are green?',
+        type: 'mcq',
+        options: ['5/33', '25/144', '5/12', '7/33', '10/33'],
+        audioText: 'What is the probability that both apples picked without replacement are green?',
+        correctAnswer: '5/33',
+        solution: 'P(1st green) = 5/12. P(2nd green) = 4/11. P(both green) = (5/12) × (4/11) = 20/132 = 5/33.',
+        insight: 'Dependent compound probability without replacement.'
+      }
+    ];
+
+    /* ==========================================================================
+       APP INITIALIZATION & CONTROLS
+       ========================================================================== */
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('form-registration').addEventListener('submit', (e) => {
+        e.preventDefault();
+        studentData.name = document.getElementById('reg-name').value.trim();
+        studentData.yearLevel = document.getElementById('reg-year').value;
+        studentData.sessionId = document.getElementById('reg-session').value.trim();
+
+        document.getElementById('nav-student-name').textContent = studentData.name;
+        document.getElementById('nav-year-level').textContent = studentData.yearLevel;
+        document.getElementById('nav-test-id').textContent = studentData.sessionId;
+        document.getElementById('header-user-info').classList.remove('hidden');
+
+        document.getElementById('screen-registration').classList.add('hidden');
+        document.getElementById('screen-test').classList.remove('hidden');
+        document.getElementById('screen-test').classList.add('flex');
+
+        initTestSession();
+      });
+    });
+
+    function initTestSession() {
+      currentQuestionIndex = 0;
+      studentAnswers = {};
+      flaggedQuestions.clear();
+      q1SelectedShapes.clear();
+      q3ChocolatesInBox = 0;
+
+      // Shuffle MCQ options once
+      questionBank.forEach(q => {
+        if (q.type === 'mcq' && q.options) {
+          q.shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+        }
+      });
+
+      renderQuestion(0);
+      renderQuickJumpGrid();
+    }
+
+    function renderQuickJumpGrid() {
+      const container = document.getElementById('quick-jump-grid');
+      container.innerHTML = '';
+      questionBank.forEach((q, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `w-7 h-7 rounded-md text-[11px] font-bold transition flex items-center justify-center border ${getQuickJumpStyle(idx)}`;
+        btn.textContent = idx + 1;
+        btn.onclick = () => jumpToQuestion(idx);
+        container.appendChild(btn);
+      });
+    }
+
+    function getQuickJumpStyle(idx) {
+      const isCurrent = idx === currentQuestionIndex;
+      const isAnswered = studentAnswers[questionBank[idx].id] !== undefined;
+      const isFlagged = flaggedQuestions.has(questionBank[idx].id);
+
+      if (isCurrent) return 'bg-teal-600 text-white border-teal-600 ring-2 ring-teal-300';
+      if (isFlagged) return 'bg-amber-100 text-amber-900 border-amber-400 font-bold';
+      if (isAnswered) return 'bg-slate-800 text-white border-slate-800';
+      return 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-200';
+    }
+
+    function jumpToQuestion(idx) {
+      saveCurrentQuestionAnswer();
+      currentQuestionIndex = idx;
+      renderQuestion(currentQuestionIndex);
+      renderQuickJumpGrid();
+    }
+
+    function navigateQuestion(delta) {
+      saveCurrentQuestionAnswer();
+      const newIdx = currentQuestionIndex + delta;
+      if (newIdx >= 0 && newIdx < questionBank.length) {
+        currentQuestionIndex = newIdx;
+        renderQuestion(currentQuestionIndex);
+        renderQuickJumpGrid();
+      } else if (newIdx >= questionBank.length) {
+        submitAssessment();
+      }
+    }
+
+    function toggleFlag() {
+      const qId = questionBank[currentQuestionIndex].id;
+      if (flaggedQuestions.has(qId)) flaggedQuestions.delete(qId);
+      else flaggedQuestions.add(qId);
+      updateFlagUI();
+      renderQuickJumpGrid();
+    }
+
+    function updateFlagUI() {
+      const qId = questionBank[currentQuestionIndex].id;
+      const isFlagged = flaggedQuestions.has(qId);
+      const flagIcon = document.getElementById('flag-icon');
+      const flagText = document.getElementById('flag-text');
+
+      if (isFlagged) {
+        flagIcon.className = 'fa-solid fa-flag text-amber-500';
+        flagText.textContent = 'Flagged';
+      } else {
+        flagIcon.className = 'fa-regular fa-flag text-slate-400';
+        flagText.textContent = 'Flag';
+      }
+    }
+
+    function playQuestionAudio() {
+      const q = questionBank[currentQuestionIndex];
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(q.audioText || q.prompt);
+        utterance.rate = 0.95;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    /* ==========================================================================
+       DYNAMIC RENDERERS FOR VISUAL MANIPULATIVES
+       ========================================================================== */
+
+    function renderQuestion(index) {
+      const q = questionBank[index];
+
+      document.getElementById('question-badge').textContent = q.strand;
+      document.getElementById('phase-badge').textContent = q.phase;
+      document.getElementById('question-counter-text').textContent = `Question ${index + 1} of ${questionBank.length}`;
+      document.getElementById('q-number-label').textContent = `Q${index + 1}.`;
+      document.getElementById('q-prompt').textContent = q.prompt;
+
+      const pct = ((index + 1) / questionBank.length) * 100;
+      document.getElementById('test-progress-bar').style.width = `${pct}%`;
+
+      document.getElementById('btn-prev').disabled = index === 0;
+      const nextLabel = document.getElementById('btn-next-label');
+      const nextIcon = document.getElementById('btn-next-icon');
+      if (index === questionBank.length - 1) {
+        nextLabel.textContent = 'Submit Assessment';
+        nextIcon.className = 'fa-solid fa-check text-xs';
+      } else {
+        nextLabel.textContent = 'Next';
+        nextIcon.className = 'fa-solid fa-chevron-right text-xs';
+      }
+
+      updateFlagUI();
+
+      const canvasContainer = document.getElementById('manipulative-container');
+      const answersContainer = document.getElementById('answers-container');
+      canvasContainer.innerHTML = '';
+      answersContainer.innerHTML = '';
+
+      switch (q.id) {
+        case 'Q1': renderQ1Grid12(canvasContainer, answersContainer); break;
+        case 'Q2': renderQ2NumberLine41(canvasContainer); renderMCQOptions(q, answersContainer); break;
+        case 'Q3': renderQ3ChocBox(canvasContainer, answersContainer); break;
+        case 'Q4': renderQ4TileBorder(canvasContainer); renderMCQOptions(q, answersContainer); break;
+        case 'Q5': renderQ5ClimateGraph(canvasContainer); renderMCQOptions(q, answersContainer); break;
+        case 'Q6': renderQ6CashierSVG(canvasContainer); renderFillBlankInput(q, answersContainer); break;
+        case 'Q7': renderQ7JenTylerSVG(canvasContainer); renderMCQOptions(q, answersContainer); break;
+        case 'Q8': renderQ8MerePounamuOffset(canvasContainer); renderMCQOptions(q, answersContainer); break;
+        case 'Q11': renderQ11PercentageGrid(canvasContainer); renderMCQOptions(q, answersContainer); break;
+        case 'Q13': renderQ13SupplementaryAngleSVG(canvasContainer); renderMCQOptions(q, answersContainer); break;
+        case 'Q14': renderQ14ReflectionSVG(canvasContainer); renderMCQOptions(q, answersContainer); break;
+        case 'Q16': renderQ16JourneyGraphSVG(canvasContainer); renderMCQOptions(q, answersContainer); break;
+        case 'Q22': renderQ22PythagorasSVG(canvasContainer); renderMCQOptions(q, answersContainer); break;
+        case 'Q23': renderQ23CylinderTankSVG(canvasContainer); renderFillBlankInput(q, answersContainer); break;
+        case 'Q26': renderQ26BoxPlotSVG(canvasContainer); renderMCQOptions(q, answersContainer); break;
+        case 'Q29': renderQ29TrigTriangleSVG(canvasContainer); renderMCQOptions(q, answersContainer); break;
+        default:
+          if (q.type === 'fill_blank') renderFillBlankInput(q, answersContainer);
+          else renderMCQOptions(q, answersContainer);
+      }
+    }
+
+    /* Q1: Grid Area of 12 Squares */
+    function renderQ1Grid12(container, answersContainer) {
+      const existing = studentAnswers['Q1'];
+      if (Array.isArray(existing)) q1SelectedShapes = new Set(existing);
+
+      let svg = `<div class="flex flex-col items-center w-full">
+        <p class="text-xs text-slate-500 mb-2 text-center"><i class="fa-solid fa-hand-pointer text-teal-600 mr-1"></i>Click shapes to select all that have an area of 12 squares</p>
+        <svg width="440" height="220" viewBox="0 0 440 220" class="border-2 border-red-500 bg-slate-100 rounded-lg shadow-inner">
+          <!-- Background Grid Lines -->
+          ${Array.from({length: 22}).map((_, c) => `<line x1="${c*20}" y1="0" x2="${c*20}" y2="220" stroke="#f87171" stroke-width="1"/>`).join('')}
+          ${Array.from({length: 11}).map((_, r) => `<line x1="0" y1="${r*20}" x2="440" y2="${r*20}" stroke="#f87171" stroke-width="1"/>`).join('')}
+          
+          <!-- Shape A: 3 wide x 4 high = 12 squares (top left) -->
+          <g onclick="toggleQ1Shape('Shape A')" class="cursor-pointer">
+            <rect x="0" y="0" width="80" height="80" fill="${q1SelectedShapes.has('Shape A') ? '#0d9488' : '#70882d'}" stroke="#b91c1c" stroke-width="2"/>
+            <text x="40" y="45" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Shape A</text>
+          </g>
+
+          <!-- Shape B: L-Shape = 12 squares (center) -->
+          <g onclick="toggleQ1Shape('Shape B')" class="cursor-pointer">
+            <path d="M 120 40 L 200 40 L 200 60 L 160 60 L 160 140 L 120 140 Z" 
+              fill="${q1SelectedShapes.has('Shape B') ? '#0d9488' : '#70882d'}" stroke="#b91c1c" stroke-width="2"/>
+            <text x="150" y="90" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Shape B</text>
+          </g>
+
+          <!-- Shape C: 2 wide x 6 high = 12 squares (right side) -->
+          <g onclick="toggleQ1Shape('Shape C')" class="cursor-pointer">
+            <rect x="240" y="0" width="40" height="140" fill="${q1SelectedShapes.has('Shape C') ? '#0d9488' : '#70882d'}" stroke="#b91c1c" stroke-width="2"/>
+            <text x="260" y="75" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Shape C</text>
+          </g>
+
+          <!-- Shape D: Compound shape = 10 squares (bottom left) -->
+          <g onclick="toggleQ1Shape('Shape D')" class="cursor-pointer">
+            <polygon points="0,120 80,120 80,160 40,160 40,200 0,200" 
+              fill="${q1SelectedShapes.has('Shape D') ? '#0d9488' : '#70882d'}" stroke="#b91c1c" stroke-width="2"/>
+            <text x="40" y="165" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Shape D</text>
+          </g>
+        </svg>
+      </div>`;
+      container.innerHTML = svg;
+
+      answersContainer.innerHTML = `
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+          <span class="text-sm font-semibold text-slate-700">Selected Shapes: </span>
+          <span class="text-sm font-bold text-teal-700">${q1SelectedShapes.size > 0 ? Array.from(q1SelectedShapes).sort().join(', ') : 'None'}</span>
+        </div>
+      `;
+    }
+
+    window.toggleQ1Shape = function(id) {
+      if (q1SelectedShapes.has(id)) q1SelectedShapes.delete(id);
+      else q1SelectedShapes.add(id);
+      studentAnswers['Q1'] = Array.from(q1SelectedShapes);
+      renderQ1Grid12(document.getElementById('manipulative-container'), document.getElementById('answers-container'));
+      renderQuickJumpGrid();
+    };
+
+    /* Q2: Number Line 4.0 to 4.2 pointing to 4.1 */
+    function renderQ2NumberLine41(container) {
+      container.innerHTML = `
+        <svg width="450" height="140" viewBox="0 0 450 140" class="max-w-full">
+          <line x1="40" y1="50" x2="410" y2="50" stroke="#1e293b" stroke-width="3"/>
+          <polygon points="35,50 48,42 48,58" fill="#1e293b"/>
+          <polygon points="415,50 402,42 402,58" fill="#1e293b"/>
+          
+          <line x1="100" y1="30" x2="100" y2="70" stroke="#1e293b" stroke-width="3"/>
+          <text x="100" y="98" text-anchor="middle" font-size="22" font-weight="extrabold" fill="#1e293b">4.0</text>
+          
+          <line x1="340" y1="30" x2="340" y2="70" stroke="#1e293b" stroke-width="3"/>
+          <text x="340" y="98" text-anchor="middle" font-size="22" font-weight="extrabold" fill="#1e293b">4.2</text>
+          
+          <line x1="220" y1="30" x2="220" y2="68" stroke="#1e293b" stroke-width="3"/>
+          <polygon points="220,30 210,50 230,50" fill="#1e293b"/>
+          <line x1="220" y1="68" x2="220" y2="130" stroke="#1e293b" stroke-width="2.5"/>
+        </svg>
+      `;
+    }
+
+    /* Q3: FULLY FIXED CHOCOLATE SHARING MANIPULATIVE (Pointer Drag & Drop + Click-to-Transfer) */
+    function renderQ3ChocBox(container, answersContainer) {
+      if (studentAnswers['Q3'] !== undefined) {
+        q3ChocolatesInBox = parseInt(studentAnswers['Q3']) || 0;
+      } else {
+        q3ChocolatesInBox = 0;
+      }
+
+      const totalChocs = 8;
+      const countInBox = q3ChocolatesInBox;
+      const countInPool = totalChocs - countInBox;
+
+      container.innerHTML = `
+        <div class="flex flex-col items-center space-y-6 w-full max-w-lg">
+          <div class="text-xs text-slate-500 font-medium flex items-center justify-center space-x-2 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full">
+            <i class="fa-solid fa-hand-pointer text-amber-600"></i>
+            <span><strong>Drag chocolates</strong> into the box, or <strong>click a chocolate</strong> to move it!</span>
+          </div>
+
+          <!-- Drop Zone: Chocolate Box -->
+          <div id="choc-box-zone"
+            ondragover="allowChocDrop(event)"
+            ondragleave="leaveChocDrop(event)"
+            ondrop="handleChocDrop(event)"
+            class="w-full max-w-sm h-44 bg-gradient-to-b from-pink-100 to-pink-200 border-4 border-dashed border-pink-400 hover:border-pink-600 rounded-2xl p-4 shadow-inner flex flex-col justify-between transition-all duration-200 relative group">
+            
+            <div class="bg-pink-600 text-white font-serif tracking-wide text-center text-xs font-bold rounded-md py-1 shadow-sm uppercase">
+              &mdash; The Finest Chocolate Box &mdash;
+            </div>
+
+            <div id="box-items-container" class="flex flex-wrap items-center justify-center gap-3 min-h-[80px] p-2">
+              ${countInBox === 0 ? `<p id="box-empty-label" class="text-xs font-semibold text-pink-400 italic">Drop or click chocolates here to fill the box</p>` : ''}
+              ${Array.from({length: countInBox}).map((_, i) => `
+                <button onclick="removeChocFromBox()" title="Click to remove from box"
+                  class="w-11 h-11 rounded-full bg-amber-900 border-2 border-amber-400 text-amber-200 shadow-lg flex items-center justify-center text-lg hover:scale-110 active:scale-95 transition transform animate-popIn">
+                  <i class="fa-solid fa-cookie"></i>
+                </button>
+              `).join('')}
+            </div>
+
+            <div class="text-center text-[11px] font-bold text-pink-700 uppercase tracking-wider">
+              Box Target Area
+            </div>
+          </div>
+
+          <!-- Available Chocolates Pool -->
+          <div class="w-full bg-slate-100 border border-slate-200 rounded-2xl p-4 flex flex-col items-center space-y-2">
+            <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">
+              Available Chocolates Pool (${countInPool} remaining)
+            </span>
+            
+            <div class="flex flex-wrap items-center justify-center gap-3 min-h-[50px]">
+              ${Array.from({length: countInPool}).map((_, i) => `
+                <div draggable="true"
+                  ondragstart="handleChocDragStart(event)"
+                  onclick="addChocToBox()"
+                  class="choc-draggable w-11 h-11 rounded-full bg-amber-800 hover:bg-amber-700 border-2 border-amber-300 text-amber-200 shadow-md flex items-center justify-center text-lg cursor-grab active:cursor-grabbing hover:scale-110 active:scale-95 transition transform">
+                  <i class="fa-solid fa-cookie pointer-events-none"></i>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      answersContainer.innerHTML = `
+        <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0 bg-slate-50 p-4 rounded-xl border border-slate-200 max-w-lg mx-auto">
+          <div class="flex items-center space-x-2">
+            <span class="text-sm font-semibold text-slate-700">Chocolates in box:</span>
+            <span class="text-2xl font-black text-amber-900 bg-amber-100 border border-amber-300 px-3 py-0.5 rounded-lg">${countInBox}</span>
+          </div>
+          <button onclick="resetChocBox()" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-2 rounded-lg font-bold transition flex items-center space-x-1">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>Reset Chocolates</span>
+          </button>
+        </div>
+      `;
+    }
+
+    // Drag & Drop Handlers for Q3
+    window.handleChocDragStart = function(e) {
+      e.dataTransfer.setData('text/plain', 'choc');
+      e.dataTransfer.effectAllowed = 'move';
+    };
+
+    window.allowChocDrop = function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const box = document.getElementById('choc-box-zone');
+      if (box) box.classList.add('bg-pink-300', 'border-pink-600', 'scale-[1.02]');
+    };
+
+    window.leaveChocDrop = function(e) {
+      const box = document.getElementById('choc-box-zone');
+      if (box) box.classList.remove('bg-pink-300', 'border-pink-600', 'scale-[1.02]');
+    };
+
+    window.handleChocDrop = function(e) {
+      e.preventDefault();
+      const box = document.getElementById('choc-box-zone');
+      if (box) box.classList.remove('bg-pink-300', 'border-pink-600', 'scale-[1.02]');
+      addChocToBox();
+    };
+
+    window.addChocToBox = function() {
+      if (q3ChocolatesInBox < 8) {
+        q3ChocolatesInBox++;
+        studentAnswers['Q3'] = q3ChocolatesInBox;
+        renderQuestion(2);
+        renderQuickJumpGrid();
+      }
+    };
+
+    window.removeChocFromBox = function() {
+      if (q3ChocolatesInBox > 0) {
+        q3ChocolatesInBox--;
+        studentAnswers['Q3'] = q3ChocolatesInBox;
+        renderQuestion(2);
+        renderQuickJumpGrid();
+      }
+    };
+
+    window.resetChocBox = function() {
+      q3ChocolatesInBox = 0;
+      studentAnswers['Q3'] = 0;
+      renderQuestion(2);
+      renderQuickJumpGrid();
+    };
+
+    /* Q4: Floor Tiling Border SVG */
+    function renderQ4TileBorder(container) {
+      container.innerHTML = `
+        <svg width="280" height="240" viewBox="0 0 280 240" class="border border-slate-200 bg-white rounded-xl p-3 shadow-sm">
+          ${Array.from({length: 5}).map((_, r) => 
+            Array.from({length: 6}).map((_, c) => {
+              const isBorder = (r === 0 || r === 4 || c === 0 || c === 5);
+              return `<rect x="${c*42 + 14}" y="${r*42 + 14}" width="38" height="38" rx="4" 
+                fill="${isBorder ? '#e58e46' : '#f8fafc'}" stroke="${isBorder ? '#b45309' : '#cbd5e1'}" stroke-dasharray="${isBorder ? '0' : '3,3'}"/>`;
+            }).join('')
+          ).join('')}
+        </svg>
+      `;
+    }
+
+    /* Q5: Climate Change Graph SVG */
+    function renderQ5ClimateGraph(container) {
+      container.innerHTML = `
+        <svg width="480" height="230" viewBox="0 0 480 230" class="max-w-full bg-white border border-slate-200 rounded-xl p-3">
+          <text x="240" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f172a">What can we do about climate change at school?</text>
+          
+          <line x1="50" y1="35" x2="50" y2="180" stroke="#94a3b8" stroke-width="1.5"/>
+          <line x1="50" y1="180" x2="450" y2="180" stroke="#94a3b8" stroke-width="1.5"/>
+          
+          ${[0, 4, 8, 12, 16, 20].map(v => `
+            <line x1="45" y1="${180 - v*6.5}" x2="450" y2="${180 - v*6.5}" stroke="#f1f5f9" stroke-width="1"/>
+            <text x="38" y="${180 - v*6.5 + 4}" text-anchor="end" font-size="9" font-weight="bold" fill="#64748b">${v}</text>
+          `).join('')}
+
+          <rect x="70" y="${180 - 17*6.5}" width="40" height="${17*6.5}" fill="#70882d" rx="2"/>
+          <text x="90" y="195" text-anchor="middle" font-size="9" font-weight="bold">Recycle more</text>
+
+          <rect x="150" y="${180 - 19*6.5}" width="40" height="${19*6.5}" fill="#70882d" rx="2"/>
+          <text x="170" y="195" text-anchor="middle" font-size="9" font-weight="bold">Plant trees</text>
+
+          <rect x="230" y="${180 - 5*6.5}" width="40" height="${5*6.5}" fill="#70882d" rx="2"/>
+          <text x="250" y="195" text-anchor="middle" font-size="9" font-weight="bold">Reduce waste</text>
+
+          <rect x="310" y="${180 - 7*6.5}" width="40" height="${7*6.5}" fill="#70882d" rx="2"/>
+          <text x="330" y="195" text-anchor="middle" font-size="9" font-weight="bold">Start compost</text>
+
+          <rect x="390" y="${180 - 5*6.5}" width="40" height="${5*6.5}" fill="#70882d" rx="2"/>
+          <text x="410" y="195" text-anchor="middle" font-size="9" font-weight="bold">Start garden</text>
+
+          <text x="240" y="218" text-anchor="middle" font-size="11" font-weight="bold" fill="#475569">Things that people could do</text>
+        </svg>
+      `;
+    }
+
+    /* Q6: Cashier Illustration SVG */
+    function renderQ6CashierSVG(container) {
+      container.innerHTML = `
+        <div class="flex flex-col items-center space-y-2">
+          <svg width="220" height="150" viewBox="0 0 220 150" class="max-w-full">
+            <rect x="20" y="90" width="180" height="40" fill="#334155" rx="6"/>
+            <rect x="40" y="60" width="60" height="30" fill="#0284c7" rx="4"/>
+            <circle cx="150" cy="40" r="22" fill="#fbcfe8"/>
+            <path d="M 120 110 C 120 70, 180 70, 180 110 Z" fill="#38bdf8"/>
+          </svg>
+        </div>
+      `;
+    }
+
+    /* Q7: Jen & Tyler Characters SVG */
+    function renderQ7JenTylerSVG(container) {
+      container.innerHTML = `
+        <svg width="260" height="160" viewBox="0 0 260 160" class="max-w-full">
+          <g transform="translate(50, 20)">
+            <circle cx="30" cy="25" r="18" fill="#d97706"/>
+            <path d="M 15 70 Q 30 50 45 70 L 45 120 L 15 120 Z" fill="#ca8a04"/>
+            <text x="30" y="135" text-anchor="middle" font-size="12" font-weight="bold">Jen ($5.50)</text>
+          </g>
+
+          <g transform="translate(150, 20)">
+            <circle cx="30" cy="25" r="18" fill="#9a3412"/>
+            <rect x="18" y="55" width="24" height="45" fill="#dc2626" rx="4"/>
+            <rect x="20" y="100" width="20" height="20" fill="#475569"/>
+            <text x="30" y="135" text-anchor="middle" font-size="12" font-weight="bold">Tyler ($3.30)</text>
+          </g>
+        </svg>
+      `;
+    }
+
+    /* Q8: Mere Pounamu Offset Ruler SVG */
+    function renderQ8MerePounamuOffset(container) {
+      container.innerHTML = `
+        <svg width="480" height="170" viewBox="0 0 480 170" class="max-w-full">
+          <g transform="translate(0, 10)">
+            <path d="M 120 40 Q 180 15, 310 25 Q 410 30, 410 45 Q 410 60, 310 55 Q 180 65, 120 40 Z" fill="#3f6212" stroke="#1a2e05" stroke-width="2"/>
+            <line x1="120" y1="50" x2="120" y2="95" stroke="#000000" stroke-dasharray="4,4" stroke-width="2"/>
+            <line x1="410" y1="45" x2="410" y2="95" stroke="#000000" stroke-dasharray="4,4" stroke-width="2"/>
+          </g>
+
+          <g transform="translate(30, 95)">
+            <rect x="0" y="0" width="420" height="55" fill="#e2e8f0" stroke="#cbd5e1"/>
+            ${Array.from({length: 11}).map((_, cm) => {
+              const x = cm * 40;
+              return `
+                <line x1="${x}" y1="0" x2="${x}" y2="22" stroke="#0f172a" stroke-width="2"/>
+                <text x="${x}" y="42" text-anchor="middle" font-size="13" font-weight="bold" fill="#0f172a">${cm}</text>
+                ${cm < 10 ? Array.from({length: 9}).map((_, mm) => `<line x1="${x + (mm+1)*4}" y1="0" x2="${x + (mm+1)*4}" y2="${mm === 4 ? 14 : 8}" stroke="#475569" stroke-width="1"/>`).join('') : ''}
+              `;
+            }).join('')}
+            <text x="12" y="50" font-size="10" font-weight="bold" fill="#64748b">cm</text>
+          </g>
+        </svg>
+      `;
+    }
+
+    /* Q11: Percentage Grid SVG */
+    function renderQ11PercentageGrid(container) {
+      container.innerHTML = `
+        <svg width="220" height="220" viewBox="0 0 220 220" class="border border-slate-300 bg-white rounded-xl p-2">
+          ${Array.from({length: 100}).map((_, i) => {
+            const r = Math.floor(i / 10);
+            const c = i % 10;
+            const isShaded = i < 45;
+            return `<rect x="${c*20 + 10}" y="${r*20 + 10}" width="18" height="18" rx="2" 
+              fill="${isShaded ? '#0d9488' : '#f1f5f9'}" stroke="#cbd5e1"/>`;
+          }).join('')}
+        </svg>
+      `;
+    }
+
+    /* Q13: Supplementary Angle SVG */
+    function renderQ13SupplementaryAngleSVG(container) {
+      container.innerHTML = `
+        <svg width="380" height="150" viewBox="0 0 380 150" class="max-w-full">
+          <line x1="30" y1="110" x2="350" y2="110" stroke="#0f172a" stroke-width="3"/>
+          <line x1="200" y1="110" x2="110" y2="30" stroke="#0d9488" stroke-width="3"/>
+          <path d="M 160 110 A 40 40 0 0 1 178 88" fill="none" stroke="#0284c7" stroke-width="2"/>
+          <text x="145" y="85" font-size="14" font-weight="bold" fill="#0284c7">125°</text>
+          <path d="M 230 110 A 30 30 0 0 0 182 92" fill="none" stroke="#d97706" stroke-width="2"/>
+          <text x="210" y="85" font-size="14" font-weight="bold" fill="#d97706">Angle x</text>
+        </svg>
+      `;
+    }
+
+    /* Q14: Reflection Coordinate SVG */
+    function renderQ14ReflectionSVG(container) {
+      container.innerHTML = `
+        <svg width="300" height="200" viewBox="0 0 300 200" class="border border-slate-200 bg-white rounded-xl">
+          <line x1="150" y1="10" x2="150" y2="190" stroke="#0f172a" stroke-width="2"/>
+          <line x1="10" y1="100" x2="290" y2="100" stroke="#0f172a" stroke-width="2"/>
+          <circle cx="210" cy="40" r="6" fill="#0d9488"/>
+          <text x="220" y="45" font-size="12" font-weight="bold">(3, 4)</text>
+          <circle cx="210" cy="160" r="6" fill="#f59e0b"/>
+          <text x="220" y="165" font-size="12" font-weight="bold" fill="#b45309">?</text>
+        </svg>
+      `;
+    }
+
+    /* Q16: Distance-Time Graph SVG */
+    function renderQ16JourneyGraphSVG(container) {
+      container.innerHTML = `
+        <svg width="400" height="180" viewBox="0 0 400 180" class="max-w-full border border-slate-200 bg-white rounded-xl p-2">
+          <polyline points="40,150 140,70 180,70 280,20" fill="none" stroke="#0d9488" stroke-width="3"/>
+          <circle cx="40" cy="150" r="4" fill="#0f172a"/>
+          <circle cx="140" cy="70" r="4" fill="#0f172a"/>
+          <circle cx="180" cy="70" r="4" fill="#0f172a"/>
+          <circle cx="280" cy="20" r="4" fill="#0f172a"/>
+          <text x="20" y="25" font-size="10" font-weight="bold">Distance (km)</text>
+          <text x="320" y="170" font-size="10" font-weight="bold">Time (mins)</text>
+        </svg>
+      `;
+    }
+
+    /* Q22: Pythagoras Flagpole SVG */
+    function renderQ22PythagorasSVG(container) {
+      container.innerHTML = `
+        <svg width="300" height="180" viewBox="0 0 300 180" class="max-w-full">
+          <line x1="60" y1="150" x2="240" y2="150" stroke="#334155" stroke-width="3"/>
+          <line x1="240" y1="150" x2="240" y2="30" stroke="#0f172a" stroke-width="4"/>
+          <line x1="60" y1="150" x2="240" y2="30" stroke="#0d9488" stroke-width="3" stroke-dasharray="4,3"/>
+          <text x="150" y="170" text-anchor="middle" font-size="12" font-weight="bold">12 m</text>
+          <text x="255" y="90" font-size="12" font-weight="bold">16 m</text>
+          <text x="130" y="80" font-size="12" font-weight="bold" fill="#0d9488">Guy Wire = ?</text>
+        </svg>
+      `;
+    }
+
+    /* Q23: Cylinder Tank SVG */
+    function renderQ23CylinderTankSVG(container) {
+      container.innerHTML = `
+        <svg width="220" height="180" viewBox="0 0 220 180" class="max-w-full">
+          <ellipse cx="110" cy="40" rx="60" ry="20" fill="#0284c7" opacity="0.6" stroke="#0369a1" stroke-width="2"/>
+          <rect x="50" y="40" width="120" height="100" fill="#38bdf8" opacity="0.3"/>
+          <line x1="50" y1="40" x2="50" y2="140" stroke="#0369a1" stroke-width="2"/>
+          <line x1="170" y1="40" x2="170" y2="140" stroke="#0369a1" stroke-width="2"/>
+          <ellipse cx="110" cy="140" rx="60" ry="20" fill="#0284c7" opacity="0.8" stroke="#0369a1" stroke-width="2"/>
+          <line x1="110" y1="40" x2="170" y2="40" stroke="#0f172a" stroke-width="2"/>
+          <text x="135" y="32" font-size="11" font-weight="bold">r = 2m</text>
+          <text x="180" y="95" font-size="11" font-weight="bold">h = 5m</text>
+        </svg>
+      `;
+    }
+
+    /* Q26: Box Plot SVG */
+    function renderQ26BoxPlotSVG(container) {
+      container.innerHTML = `
+        <svg width="420" height="140" viewBox="0 0 420 140" class="max-w-full bg-white border border-slate-200 rounded-xl p-2">
+          <line x1="50" y1="70" x2="370" y2="70" stroke="#475569" stroke-width="2"/>
+          <rect x="140" y="40" width="140" height="60" fill="#cbd5e1" stroke="#0f172a" stroke-width="2"/>
+          <line x1="200" y1="40" x2="200" y2="100" stroke="#0d9488" stroke-width="3"/>
+          <line x1="50" y1="50" x2="50" y2="90" stroke="#0f172a" stroke-width="2"/>
+          <line x1="370" y1="50" x2="370" y2="90" stroke="#0f172a" stroke-width="2"/>
+          <text x="50" y="118" text-anchor="middle" font-size="10" font-weight="bold">10</text>
+          <text x="140" y="118" text-anchor="middle" font-size="10" font-weight="bold">Q1=22</text>
+          <text x="200" y="118" text-anchor="middle" font-size="10" font-weight="bold">30</text>
+          <text x="280" y="118" text-anchor="middle" font-size="10" font-weight="bold">Q3=45</text>
+          <text x="370" y="118" text-anchor="middle" font-size="10" font-weight="bold">60</text>
+        </svg>
+      `;
+    }
+
+    /* Q29: Trig Triangle SVG */
+    function renderQ29TrigTriangleSVG(container) {
+      container.innerHTML = `
+        <svg width="300" height="160" viewBox="0 0 300 160" class="max-w-full">
+          <polygon points="40,130 240,130 240,30" fill="none" stroke="#0f172a" stroke-width="3"/>
+          <path d="M 80 130 A 40 40 0 0 0 72 116" fill="none" stroke="#0d9488" stroke-width="2"/>
+          <text x="90" y="124" font-size="12" font-weight="bold" fill="#0d9488">30°</text>
+          <text x="130" y="70" font-size="12" font-weight="bold">Hypotenuse = 20 cm</text>
+          <text x="250" y="85" font-size="12" font-weight="bold" fill="#e11d48">Opposite = ?</text>
+        </svg>
+      `;
+    }
+
+    /* ==========================================================================
+       ANSWER CONTROL BUILDERS
+       ========================================================================== */
+
+    function renderMCQOptions(q, container) {
+      const options = q.shuffledOptions || q.options;
+      const current = studentAnswers[q.id];
+
+      let html = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">`;
+      options.forEach(opt => {
+        const isSelected = current === opt;
+        const activeStyle = isSelected
+          ? 'bg-teal-600 text-white border-teal-700 shadow-md ring-2 ring-teal-400'
+          : 'bg-white text-slate-800 border-slate-300 hover:bg-slate-50 hover:border-teal-400';
+
+        html += `
+          <button onclick="selectMCQOption('${q.id}', '${opt}')"
+            class="option-btn p-4 rounded-xl border text-left font-semibold text-sm flex items-center justify-between shadow-sm ${activeStyle}">
+            <span>${opt}</span>
+            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-white bg-white' : 'border-slate-300'}">
+              ${isSelected ? '<div class="w-2.5 h-2.5 rounded-full bg-teal-600"></div>' : ''}
+            </div>
+          </button>
+        `;
+      });
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    window.selectMCQOption = function(qId, val) {
+      studentAnswers[qId] = val;
+      renderQuestion(currentQuestionIndex);
+      renderQuickJumpGrid();
+    };
+
+    function renderFillBlankInput(q, container) {
+      const currentVal = studentAnswers[q.id] || '';
+      container.innerHTML = `
+        <div class="flex flex-col items-center justify-center space-y-3 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+          <label class="text-sm font-bold text-slate-700">Enter your numerical solution:</label>
+          <input type="number" step="any" id="fill-blank-input" value="${currentVal}"
+            oninput="handleFillBlankChange('${q.id}', this.value)"
+            placeholder="e.g. 225.00"
+            class="w-full max-w-xs px-4 py-3 rounded-xl border border-slate-300 font-bold text-lg text-slate-800 text-center focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none">
+        </div>
+      `;
+    }
+
+    window.handleFillBlankChange = function(qId, val) {
+      studentAnswers[qId] = val.trim();
+      renderQuickJumpGrid();
+    };
+
+    function saveCurrentQuestionAnswer() {
+      const q = questionBank[currentQuestionIndex];
+      if (q.type === 'fill_blank') {
+        const input = document.getElementById('fill-blank-input');
+        if (input) studentAnswers[q.id] = input.value.trim();
+      }
+    }
+
+    /* ==========================================================================
+       SCORING & AUTOMATED GOOGLE SHEETS POST SUBMISSION
+       ========================================================================== */
+
+    function submitAssessment() {
+      saveCurrentQuestionAnswer();
+
+      let correctCount = 0;
+      const strandScores = {
+        'Number & Algebra': { correct: 0, total: 0 },
+        'Measurement & Geometry': { correct: 0, total: 0 },
+        'Statistics & Probability': { correct: 0, total: 0 }
+      };
+
+      const detailedResults = questionBank.map(q => {
+        let isCorrect = false;
+        const studentAns = studentAnswers[q.id];
+
+        if (q.id === 'Q1') {
+          const ansArr = Array.isArray(studentAns) ? [...studentAns].sort() : [];
+          const targetArr = [...q.correctVal].sort();
+          isCorrect = JSON.stringify(ansArr) === JSON.stringify(targetArr);
+        } else if (q.id === 'Q3') {
+          isCorrect = parseInt(studentAns) === q.correctVal;
+        } else if (q.type === 'fill_blank') {
+          isCorrect = Math.abs(parseFloat(studentAns) - parseFloat(q.correctAnswer)) < 0.05;
+        } else {
+          isCorrect = studentAns === q.correctAnswer;
+        }
+
+        if (isCorrect) correctCount++;
+
+        if (strandScores[q.strand]) {
+          strandScores[q.strand].total++;
+          if (isCorrect) strandScores[q.strand].correct++;
+        }
+
+        return {
+          qId: q.id,
+          phase: q.phase,
+          strand: q.strand,
+          prompt: q.prompt,
+          studentAns: formatAns(studentAns),
+          correctAns: formatAns(q.correctVal || q.correctAnswer),
+          isCorrect: isCorrect,
+          solution: q.solution,
+          insight: q.insight
+        };
+      });
+
+      const totalPct = Math.round((correctCount / questionBank.length) * 100);
+      const stanineMetrics = calculateStanine(totalPct, studentData.yearLevel);
+      lastEvaluatedResults = { detailedResults, totalPct, stanineMetrics };
+
+      document.getElementById('screen-test').classList.add('hidden');
+      document.getElementById('screen-results').classList.remove('hidden');
+      document.getElementById('screen-results').classList.add('flex');
+
+      document.getElementById('report-student-heading').textContent = `${studentData.name}'s Diagnostic Report`;
+      document.getElementById('report-meta-info').textContent = `Year ${studentData.yearLevel} | Session: ${studentData.sessionId} | ${new Date().toLocaleDateString('en-NZ')}`;
+      document.getElementById('report-score-pct').textContent = `${totalPct}%`;
+      document.getElementById('report-stanine-badge').textContent = `Stanine ${stanineMetrics.stanine} (${stanineMetrics.band})`;
+      document.getElementById('report-scale-score').textContent = `Achieved Level: ${stanineMetrics.curriculumLevel}`;
+
+      renderStrandCards(strandScores);
+      renderReviewTable(detailedResults);
+
+      // Automated POST request to Google Apps Script Web App URL
+      sendDataToGoogleSheet(detailedResults, totalPct, stanineMetrics);
+    }
+
+    function formatAns(ans) {
+      if (ans === undefined || ans === null || ans === '') return 'No Answer';
+      if (Array.isArray(ans)) return ans.length > 0 ? ans.join(', ') : 'None selected';
+      return String(ans);
+    }
+
+    function calculateStanine(pct, year) {
+      let stanine = 5;
+      let band = 'Average';
+      let curriculumLevel = 'Phase 2 (Level 3)';
+
+      if (pct >= 88) { stanine = 9; band = 'Very High'; curriculumLevel = 'Phase 4 (Level 5 Advanced)'; }
+      else if (pct >= 78) { stanine = 8; band = 'High'; curriculumLevel = 'Phase 4 (Level 5)'; }
+      else if (pct >= 68) { stanine = 7; band = 'Above Average'; curriculumLevel = 'Phase 3 (Level 4 High)'; }
+      else if (pct >= 55) { stanine = 6; band = 'Above Average'; curriculumLevel = 'Phase 3 (Level 4)'; }
+      else if (pct >= 42) { stanine = 5; band = 'Average'; curriculumLevel = 'Phase 2 (Level 3 High)'; }
+      else if (pct >= 30) { stanine = 4; band = 'Below Average'; curriculumLevel = 'Phase 2 (Level 3)'; }
+      else if (pct >= 20) { stanine = 3; band = 'Below Average'; curriculumLevel = 'Phase 2 (Level 2 High)'; }
+      else if (pct >= 10) { stanine = 2; band = 'Low'; curriculumLevel = 'Phase 2 (Level 2)'; }
+      else { stanine = 1; band = 'Very Low'; curriculumLevel = 'Below Phase 2'; }
+
+      return { stanine, band, curriculumLevel };
+    }
+
+    function renderStrandCards(strandScores) {
+      const container = document.getElementById('strand-cards-container');
+      container.innerHTML = '';
+
+      Object.entries(strandScores).forEach(([strand, score]) => {
+        const pct = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
+        let colorClass = 'bg-teal-500';
+        if (pct < 50) colorClass = 'bg-amber-500';
+        if (pct >= 80) colorClass = 'bg-emerald-500';
+
+        const card = document.createElement('div');
+        card.className = 'bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-3';
+        card.innerHTML = `
+          <div>
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">${strand}</div>
+            <div class="text-2xl font-black text-slate-800 mt-1">${score.correct} / ${score.total} Correct</div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+              <span>Strand Mastery</span>
+              <span>${pct}%</span>
+            </div>
+            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+              <div class="${colorClass} h-full" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderReviewTable(results) {
+      const tbody = document.getElementById('review-table-body');
+      tbody.innerHTML = '';
+
+      results.forEach((r, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/60';
+
+        const statusBadge = r.isCorrect
+          ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800"><i class="fa-solid fa-check mr-1"></i>Correct</span>`
+          : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800"><i class="fa-solid fa-xmark mr-1"></i>Incorrect</span>`;
+
+        tr.innerHTML = `
+          <td class="p-3.5 text-center font-bold text-slate-700">${r.qId}</td>
+          <td class="p-3.5 text-xs">
+            <div class="font-bold text-slate-800">${r.strand}</div>
+            <div class="text-slate-500">${r.phase}</div>
+          </td>
+          <td class="p-3.5 font-mono text-xs ${r.isCorrect ? 'text-slate-800' : 'text-red-600 font-bold'}">${r.studentAns}</td>
+          <td class="p-3.5 font-mono text-xs font-bold text-green-700">${r.correctAns}</td>
+          <td class="p-3.5 text-center">${statusBadge}</td>
+          <td class="p-3.5 text-xs text-slate-600 space-y-1">
+            <div class="font-semibold text-slate-800">${r.solution}</div>
+            <div class="text-slate-500 italic"><i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i>${r.insight}</div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* Automated Google Sheet POST Function */
+    async function sendDataToGoogleSheet(results, totalPct, stanineMetrics) {
+      const statusEl = document.getElementById('sheet-sync-status');
+      if (statusEl) {
+        statusEl.innerHTML = `<span class="inline-flex items-center text-amber-300 font-bold"><i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Logging assessment results to Google Sheet...</span>`;
+      }
+
+      const payload = {
+        studentName: studentData.name,
+        yearLevel: studentData.yearLevel,
+        sessionId: studentData.sessionId,
+        overallPercentage: totalPct,
+        stanineBand: stanineMetrics.stanine,
+        items: results.map(r => ({
+          questionId: r.qId,
+          phase: r.phase,
+          strand: r.strand,
+          userAnswer: r.studentAns,
+          correctAnswer: r.correctAns,
+          isCorrect: r.isCorrect,
+          insight: r.insight
+        }))
+      };
+
+      try {
+        await fetch(GOOGLE_APPS_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (statusEl) {
+          statusEl.innerHTML = `<span class="inline-flex items-center text-emerald-400 font-bold bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-500/40"><i class="fa-solid fa-circle-check mr-1.5"></i> Results automatically logged to Google Sheet backend!</span>`;
+        }
+      } catch (err) {
+        console.error("Google Sheet POST error:", err);
+        if (statusEl) {
+          statusEl.innerHTML = `<span class="inline-flex items-center text-amber-400 font-bold"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i> Auto-logging offline. CSV download ready below.</span>`;
+        }
+      }
+    }
+
+    window.resendGoogleSheetData = function() {
+      if (lastEvaluatedResults) {
+        sendDataToGoogleSheet(
+          lastEvaluatedResults.detailedResults,
+          lastEvaluatedResults.totalPct,
+          lastEvaluatedResults.stanineMetrics
+        );
+      }
+    };
+
+    window.downloadCSVExport = function() {
+      if (!lastEvaluatedResults) return;
+      const { detailedResults, totalPct, stanineMetrics } = lastEvaluatedResults;
+      const timestamp = new Date().toISOString();
+
+      let csv = ['Timestamp,Student Name,Year Level,Session ID,Question ID,Phase,Strand,Student Answer,Correct Answer,Is Correct,Total Score (%),Stanine'];
+      detailedResults.forEach(r => {
+        csv.push(`${timestamp},"${studentData.name}",${studentData.yearLevel},"${studentData.sessionId}",${r.qId},"${r.phase}","${r.strand}","${r.studentAns}","${r.correctAns}",${r.isCorrect ? 1 : 0},${totalPct},${stanineMetrics.stanine}`);
+      });
+
+      const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${studentData.name.replace(/\s+/g, '_')}_NZ_Math_Diagnostic.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    };
+
+    window.resetAssessment = function() {
+      document.getElementById('screen-results').classList.add('hidden');
+      document.getElementById('screen-results').classList.remove('flex');
+      document.getElementById('screen-registration').classList.open;
+      document.getElementById('screen-registration').classList.remove('hidden');
+      document.getElementById('header-user-info').classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+  </script>
+</body>
+</html>
